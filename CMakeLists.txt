@@ -5,10 +5,13 @@ cmake_minimum_required (VERSION 2.6)
 #set ( CMAKE_C_COMPILER gcc )
 #set ( CMAKE_CXX_COMPILER g++ )
 #set(CMAKE_CXX_FLAGS "-std=c++11 -g3")
+#set(CMAKE_CXX_FLAGS "-g3")
 set ( CMAKE_BUILD_TYPE Debug )
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 
 add_definitions( -std=c++11 )
+add_definitions( -g3 )
+add_definitions( -Wall )
 
 project ( CONVERTER )
 

@@ -7,7 +7,7 @@ find_package (Threads)
 
 set (
   converter_src  
-  audio_converter.cpp
+  main.cpp
   converter.cpp
   wav.c
 )

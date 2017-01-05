@@ -1,10 +1,9 @@
 #include <vector>
 #include <string>
-#include <locale>
-#include <inttypes.h>
 
 #include <sys/types.h>
 #include <dirent.h>
+#include <pthread.h>
 
 extern "C"
 {
@@ -22,19 +21,20 @@ struct sWavFile
 class cConverter
 {
 private:
-  std::string dir;
-  std::vector<sWavFile> files;
+  static std::string dir;
+  static pthread_mutex_t mutexCout;
+  static pthread_mutex_t mutexThreadsCounter;
+  static pthread_cond_t condThreadsAvailable;
+  static uint16_t threadsCounter;
 
-  std::vector<sWavFile> readFiles( const std::string arg_dir );
-  void convertFile( const sWavFile &arg_file );
+  static std::vector<sWavFile> readFiles( const std::string arg_dir );
+  static void convertFile( const sWavFile &arg_file );
   static void * convertFileThread( void * arg_file );
 
-public:
-  explicit cConverter( const std::string arg_dir )
-  : dir( arg_dir )
-  {
-    files = readFiles( arg_dir );
-  }
+  cConverter(void);
+  cConverter(const cConverter &arg_copy);
+  cConverter& operator=(const cConverter &arg_copy);
 
-  bool convert( void );
+public:
+  static void convertFilesFromDir( const std::string arg_dir );
 };

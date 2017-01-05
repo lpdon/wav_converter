@@ -1,20 +1,60 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
 #include <locale>
 #include <inttypes.h>
 #include <thread>
 
 #include <sys/types.h>
 #include <dirent.h>
-#include <pthread.h>
 
 #include "converter.hpp"
 
 extern "C"
 {
   #include "lame.h"
+}
+
+std::string cConverter::dir;
+pthread_mutex_t cConverter::mutexCout;
+pthread_mutex_t cConverter::mutexThreadsCounter;
+pthread_cond_t cConverter::condThreadsAvailable;
+uint16_t cConverter::threadsCounter = 0U;
+
+bool cConverter::convertFilesFromDir( const std::string arg_dir )
+{
+  dir = arg_dir;
+  const std::vector<sWavFile> loc_files = readFiles( arg_dir );
+
+  const uint16_t loc_maxThreads = std::thread::hardware_concurrency();
+  pthread_t loc_threads[ loc_files.size() ];
+  pthread_mutex_init( &mutexCout, NULL );
+  pthread_mutex_init( &mutexThreadsCounter, NULL );
+  pthread_cond_init( &condThreadsAvailable, NULL );
+
+  std::cout << "CPU threads available: " << loc_maxThreads << std::endl;
+  threadsCounter = loc_maxThreads;
+
+  for ( uint16_t loc_idx_file = 0U; loc_idx_file < loc_files.size(); ++loc_idx_file )
+  {
+    pthread_mutex_lock( &mutexCout );
+    std::cout << "[Thread" << loc_idx_file << "] : Converting: " << loc_files[ loc_idx_file ].name << std::endl;
+    pthread_mutex_unlock( &mutexCout );
+
+    pthread_create( &loc_threads[ loc_idx_file ], NULL, convertFileThread, (void *)&loc_files[ loc_idx_file ] );
+
+    pthread_mutex_lock( &mutexThreadsCounter );
+    threadsCounter--;
+    while( threadsCounter == 0U )
+    {
+      pthread_cond_wait( &condThreadsAvailable, &mutexThreadsCounter);
+    }
+    pthread_mutex_unlock( &mutexThreadsCounter );
+  }
+
+  for ( uint16_t loc_idx_file = 0U; loc_idx_file < loc_files.size(); ++loc_idx_file )
+  {
+    pthread_join( loc_threads[ loc_idx_file ], NULL );
+  }
 }
 
 std::vector<sWavFile> cConverter::readFiles( const std::string arg_dir )
@@ -66,56 +106,11 @@ std::vector<sWavFile> cConverter::readFiles( const std::string arg_dir )
   return loc_files;
 }
 
-void *PrintHello(void *threadid)
-{
-   long tid;
-   tid = (long)threadid;
-   printf("Hello World! It's me, thread #%ld!\n", tid);
-   pthread_exit(NULL);
-}
-//
-//int main (int argc, char *argv[])
-//{
-//   pthread_t threads[NUM_THREADS];
-//   int rc;
-//   long t;
-//   for(t=0; t<NUM_THREADS; t++){
-//      printf("In main: creating thread %ld\n", t);
-//      rc = pthread_create(&threads[t], NULL, PrintHello, (void *)t);
-//      if (rc){
-//         printf("ERROR; return code from pthread_create() is %d\n", rc);
-//         exit(-1);
-//      }
-//   }
-//
-//   /* Last thing that main() should do */
-//   pthread_exit(NULL);
-//}
-
-bool cConverter::convert( void )
-{
-  const uint16_t loc_numThreads = std::thread::hardware_concurrency();
-  pthread_t loc_threads[ loc_numThreads ];
-
-  std::cout << "Available threads: " << loc_numThreads << std::endl;
-
-//  for ( uint16_t loc_i = 0U; loc_i < files.size(); ++loc_i )
-  for ( uint16_t loc_i = 0U; loc_i < loc_numThreads; ++loc_i )
-  {
-    std::cout << "[Thread" << loc_i << "] : Converting: " << files[ loc_i ].name << std::endl;
-    pthread_create( &loc_threads[ loc_i ], NULL, convertFileThread, (void *)&files[ loc_i ] );
-//    pthread_create( &loc_threads[ loc_i ], NULL, PrintHello, (void *)loc_i );
-//    convertFile( files[ loc_i ] );
-  }
-
-  pthread_exit( NULL );
-}
-
 void cConverter::convertFile( const sWavFile &arg_file )
 {
   const WAVHEADER loc_header = arg_file.header;
   uint32_t loc_wavSizeLeft = loc_header.subchunck2Size;
-  const std::string loc_outputPath = dir + arg_file.name + ".mp3";
+  const std::string loc_outputPath = dir + "/" + arg_file.name + ".mp3";
 
   std::ifstream loc_input( arg_file.path.c_str(), std::ios::binary );
   std::ofstream loc_output( loc_outputPath.c_str(), std::ios::binary );
@@ -155,16 +150,31 @@ void cConverter::convertFile( const sWavFile &arg_file )
       }
     }
 
-    std::cout << "Finished converting: " << arg_file.name << std::endl;
+    pthread_mutex_lock( &mutexCout );
+    std::cout << "             Finished converting: " << arg_file.name << std::endl;
+    pthread_mutex_unlock( &mutexCout );
+    loc_input.close();
     loc_output.close();
     lame_close( loc_lame );
   }
-
-  pthread_exit( NULL );
+  else
+  {
+    pthread_mutex_lock( &mutexCout );
+    std::cout << "             Failed converting: " << arg_file.name << std::endl;
+    pthread_mutex_unlock( &mutexCout );
+  }
 }
 
 void * cConverter::convertFileThread ( void * arg_file )
 {
-  sWavFile * loc_pFile = static_cast<sWavFile *>( arg_file );
-  convertFile( *loc_pFile );
+  sWavFile * loc_pFile = reinterpret_cast<sWavFile *>( arg_file );
+  sWavFile loc_file = *loc_pFile;
+  convertFile( loc_file );
+
+  pthread_mutex_lock( &mutexThreadsCounter );
+  threadsCounter++;
+  pthread_cond_signal( &condThreadsAvailable );
+  pthread_mutex_unlock( &mutexThreadsCounter );
+
+  pthread_exit( NULL );
 }
