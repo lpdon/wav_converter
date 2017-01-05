@@ -161,7 +161,7 @@ void cConverter::convertFile( const sWavFile &arg_file )
         /*
          * Number of samples depending on channels
          */
-        const int loc_numSamples = loc_input.gcount() / (2 * sizeof(short int));
+        const int loc_numSamples = loc_bytesRead / (2 * sizeof(short int));
         const int loc_bytesEnc = lame_encode_buffer_interleaved( loc_lame, loc_pcmBuffer, loc_numSamples, loc_mp3Buffer, MP3_SIZE );
         loc_output.write( reinterpret_cast<char *>( loc_mp3Buffer ), loc_bytesEnc );
         loc_wavSizeLeft -= static_cast<uint32_t>( loc_input.gcount() );
