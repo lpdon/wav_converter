@@ -10,7 +10,6 @@ int main( int argc, char** argv )
    return -1;
   }
 
-//  cConverter loc_converter( argv[1] );
   cConverter::convertFilesFromDir( argv[1] );
 	return 0;
 }

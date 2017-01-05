@@ -12,17 +12,17 @@ set (
   wav.c
 )
 
+if (WIN32)
+set (
+  lame_lib
+  ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/libmp3lame/libmp3lame.lib
+)
+else ()
 set (
   lame_lib
   ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/libmp3lame/libmp3lame.a
 )
-
-add_library ( 
-  converter_src_lib 
-  STATIC 
-  IMPORTED
-  ${CMAKE_THREAD_LIBS_INIT}
-)
+endif ()
 
 add_executable ( converter ${converter_src} ) 
 

@@ -1,47 +1,36 @@
-get_audio.o: frontend/get_audio.c /usr/include/stdc-predef.h config.h \
- /usr/include/assert.h /usr/include/features.h \
- /usr/include/x86_64-linux-gnu/sys/cdefs.h \
- /usr/include/x86_64-linux-gnu/bits/wordsize.h \
- /usr/include/x86_64-linux-gnu/gnu/stubs.h \
- /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.9/include-fixed/limits.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.9/include-fixed/syslimits.h \
- /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
- /usr/include/x86_64-linux-gnu/bits/local_lim.h \
- /usr/include/linux/limits.h \
- /usr/include/x86_64-linux-gnu/bits/posix2_lim.h /usr/include/stdio.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stddef.h \
- /usr/include/x86_64-linux-gnu/bits/types.h \
- /usr/include/x86_64-linux-gnu/bits/typesizes.h /usr/include/libio.h \
- /usr/include/_G_config.h /usr/include/wchar.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stdarg.h \
- /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
- /usr/include/x86_64-linux-gnu/bits/stdio.h /usr/include/stdlib.h \
- /usr/include/x86_64-linux-gnu/bits/waitflags.h \
- /usr/include/x86_64-linux-gnu/bits/waitstatus.h /usr/include/endian.h \
- /usr/include/x86_64-linux-gnu/bits/endian.h \
- /usr/include/x86_64-linux-gnu/bits/byteswap.h \
- /usr/include/x86_64-linux-gnu/bits/byteswap-16.h \
- /usr/include/x86_64-linux-gnu/sys/types.h /usr/include/time.h \
- /usr/include/x86_64-linux-gnu/sys/select.h \
- /usr/include/x86_64-linux-gnu/bits/select.h \
- /usr/include/x86_64-linux-gnu/bits/sigset.h \
- /usr/include/x86_64-linux-gnu/bits/time.h \
- /usr/include/x86_64-linux-gnu/sys/sysmacros.h \
- /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h /usr/include/alloca.h \
- /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
- /usr/include/x86_64-linux-gnu/bits/stdlib-float.h /usr/include/string.h \
- /usr/include/xlocale.h /usr/include/x86_64-linux-gnu/bits/string.h \
- /usr/include/x86_64-linux-gnu/bits/string2.h /usr/include/math.h \
- /usr/include/x86_64-linux-gnu/bits/huge_val.h \
- /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
- /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
- /usr/include/x86_64-linux-gnu/bits/inf.h \
- /usr/include/x86_64-linux-gnu/bits/nan.h \
- /usr/include/x86_64-linux-gnu/bits/mathdef.h \
- /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
- /usr/include/x86_64-linux-gnu/bits/mathinline.h \
- /usr/include/x86_64-linux-gnu/sys/stat.h \
- /usr/include/x86_64-linux-gnu/bits/stat.h include/lame.h frontend/main.h \
- frontend/get_audio.h frontend/lametime.h frontend/console.h
+get_audio.o: frontend/get_audio.c config.h c:\mingw\include\assert.h \
+ c:\mingw\include\_mingw.h c:\mingw\include\msvcrtver.h \
+ c:\mingw\include\w32api.h c:\mingw\include\sdkddkver.h \
+ c:\mingw\include\limits.h c:\mingw\include\stdio.h \
+ c:\mingw\lib\gcc\mingw32\5.3.0\include\stddef.h \
+ c:\mingw\include\sys/types.h \
+ c:\mingw\lib\gcc\mingw32\5.3.0\include\stdarg.h \
+ c:\mingw\include\stdlib.h c:\mingw\include\string.h \
+ c:\mingw\include\strings.h c:\mingw\include\wchar.h \
+ c:\mingw\include\math.h c:\mingw\include\sys\types.h \
+ c:\mingw\include\sys\stat.h include/lame.h frontend/main.h \
+ frontend/get_audio.h frontend/lametime.h frontend/console.h \
+ c:\mingw\include\windows.h c:\mingw\include\windef.h \
+ c:\mingw\include\winnt.h c:\mingw\include\winerror.h \
+ c:\mingw\include\basetsd.h c:\mingw\include\pshpack4.h \
+ c:\mingw\include\poppack.h c:\mingw\include\wincon.h \
+ c:\mingw\include\winbase.h c:\mingw\include\wingdi.h \
+ c:\mingw\include\winuser.h c:\mingw\include\winnls.h \
+ c:\mingw\include\winver.h c:\mingw\include\winnetwk.h \
+ c:\mingw\include\winreg.h c:\mingw\include\winsvc.h \
+ c:\mingw\include\cderr.h c:\mingw\include\dde.h c:\mingw\include\ddeml.h \
+ c:\mingw\include\dlgs.h c:\mingw\include\imm.h \
+ c:\mingw\include\lzexpand.h c:\mingw\include\mmsystem.h \
+ c:\mingw\include\nb30.h c:\mingw\include\rpc.h c:\mingw\include\rpcdce.h \
+ c:\mingw\include\basetyps.h c:\mingw\include\rpcdcep.h \
+ c:\mingw\include\rpcnsi.h c:\mingw\include\rpcnterr.h \
+ c:\mingw\include\shellapi.h c:\mingw\include\pshpack2.h \
+ c:\mingw\include\winperf.h c:\mingw\include\commdlg.h \
+ c:\mingw\include\unknwn.h c:\mingw\include\objfwd.h \
+ c:\mingw\include\wtypes.h c:\mingw\include\rpcndr.h \
+ c:\mingw\include\rpcnsip.h c:\mingw\include\prsht.h \
+ c:\mingw\include\winspool.h c:\mingw\include\winsock2.h \
+ c:\mingw\include\ole2.h c:\mingw\include\objbase.h \
+ c:\mingw\include\objidl.h c:\mingw\include\cguid.h \
+ c:\mingw\include\olectlid.h c:\mingw\include\oleauto.h \
+ c:\mingw\include\oaidl.h c:\mingw\include\oleidl.h

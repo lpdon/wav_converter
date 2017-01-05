@@ -2,10 +2,14 @@
 #include <fstream>
 #include <locale>
 #include <inttypes.h>
-#include <thread>
-
 #include <sys/types.h>
 #include <dirent.h>
+
+#ifdef _WIN32
+  #include <windows.h>
+#else
+  #include <unistd.h>
+#endif
 
 #include "converter.hpp"
 
@@ -20,12 +24,18 @@ pthread_mutex_t cConverter::mutexThreadsCounter;
 pthread_cond_t cConverter::condThreadsAvailable;
 uint16_t cConverter::threadsCounter = 0U;
 
-bool cConverter::convertFilesFromDir( const std::string arg_dir )
+void cConverter::convertFilesFromDir( const std::string arg_dir )
 {
   dir = arg_dir;
   const std::vector<sWavFile> loc_files = readFiles( arg_dir );
 
-  const uint16_t loc_maxThreads = std::thread::hardware_concurrency();
+#ifdef _WIN32
+  SYSTEM_INFO sysinfo;
+  GetSystemInfo(&sysinfo);
+  const int loc_maxThreads = ( sysinfo.dwNumberOfProcessors != 0 ) ? sysinfo.dwNumberOfProcessors : 1;
+#else
+  const int loc_maxThreads = ( sysconf( _SC_NPROCESSORS_ONLN ) != 0 ) ? sysconf( _SC_NPROCESSORS_ONLN ) : 1;
+#endif
   pthread_t loc_threads[ loc_files.size() ];
   pthread_mutex_init( &mutexCout, NULL );
   pthread_mutex_init( &mutexThreadsCounter, NULL );
@@ -34,6 +44,10 @@ bool cConverter::convertFilesFromDir( const std::string arg_dir )
   std::cout << "CPU threads available: " << loc_maxThreads << std::endl;
   threadsCounter = loc_maxThreads;
 
+  /*
+   * One thread instance for each file.
+   * A thread is created every time a CPU core is available.
+   */
   for ( uint16_t loc_idx_file = 0U; loc_idx_file < loc_files.size(); ++loc_idx_file )
   {
     pthread_mutex_lock( &mutexCout );
@@ -55,6 +69,8 @@ bool cConverter::convertFilesFromDir( const std::string arg_dir )
   {
     pthread_join( loc_threads[ loc_idx_file ], NULL );
   }
+
+  pthread_exit( NULL );
 }
 
 std::vector<sWavFile> cConverter::readFiles( const std::string arg_dir )
@@ -117,6 +133,9 @@ void cConverter::convertFile( const sWavFile &arg_file )
 
   if ( loc_input.is_open() && loc_output.is_open() )
   {
+    /*
+     * Ignore the first bytes of the file containing the header
+     */
     loc_input.seekg( static_cast<std::ifstream::seekdir>( sizeof( WAVHEADER ) ) );
 
     lame_global_flags * loc_lame = lame_init();
@@ -135,15 +154,23 @@ void cConverter::convertFile( const sWavFile &arg_file )
     while ( loc_wavSizeLeft > 0U )
     {
       loc_input.read( reinterpret_cast<char *>( loc_pcmBuffer ), 2 * sizeof(short int) * PCM_SIZE );
+      std::streamsize loc_bytesRead = loc_input.gcount();
 
-      if ( loc_input.gcount() != 0 )
+      if ( loc_bytesRead != 0 )
       {
-        const int loc_bytesEnc = lame_encode_buffer_interleaved( loc_lame, loc_pcmBuffer, loc_input.gcount() / (2 * sizeof(short int)), loc_mp3Buffer, MP3_SIZE );
+        /*
+         * Number of samples depending on channels
+         */
+        const int loc_numSamples = loc_input.gcount() / (2 * sizeof(short int));
+        const int loc_bytesEnc = lame_encode_buffer_interleaved( loc_lame, loc_pcmBuffer, loc_numSamples, loc_mp3Buffer, MP3_SIZE );
         loc_output.write( reinterpret_cast<char *>( loc_mp3Buffer ), loc_bytesEnc );
         loc_wavSizeLeft -= static_cast<uint32_t>( loc_input.gcount() );
       }
       else
       {
+        /*
+         * No frames left to be read, flush the buffer
+         */
         const int loc_bytesFlushed = lame_encode_flush( loc_lame, loc_mp3Buffer, MP3_SIZE );
         loc_output.write( reinterpret_cast<char *>( loc_mp3Buffer ), loc_bytesFlushed );
         loc_wavSizeLeft = 0U;
@@ -177,4 +204,5 @@ void * cConverter::convertFileThread ( void * arg_file )
   pthread_mutex_unlock( &mutexThreadsCounter );
 
   pthread_exit( NULL );
+  return NULL;
 }

@@ -1,3 +1,6 @@
+#ifndef CONVERTER_HPP
+#define CONVERTER_HPP
+
 #include <vector>
 #include <string>
 
@@ -31,6 +34,9 @@ private:
   static void convertFile( const sWavFile &arg_file );
   static void * convertFileThread( void * arg_file );
 
+  /*
+   * Private constructor to avoid object creation
+   */
   cConverter(void);
   cConverter(const cConverter &arg_copy);
   cConverter& operator=(const cConverter &arg_copy);
@@ -38,3 +44,5 @@ private:
 public:
   static void convertFilesFromDir( const std::string arg_dir );
 };
+
+#endif
