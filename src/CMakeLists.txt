@@ -1,34 +1,41 @@
 #SRC
 
-include_directories ( ${CONVERTER_SOURCE_DIR}/include )
-include_directories ( ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/include )
+include_directories ( 
+  ${CONVERTER_SOURCE_DIR}/include
+  ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/include 
+  ${CONVERTER_SOURCE_DIR}/libs/googletest/googletest/include 
+)
 
 find_package (Threads)
 
 set (
-  converter_src  
+  lame_lib
+  ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/libmp3lame/libmp3lame.a
+)
+
+add_executable ( 
+  converter  
   main.cpp
+) 
+
+set (
+  converter_src_lib
   converter.cpp
   wav.c
 )
 
-if (WIN32)
-set (
-  lame_lib
-  ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/libmp3lame/libmp3lame.lib
+add_library (
+  converter_lib
+  ${converter_src_lib}
 )
-else ()
-set (
-  lame_lib
-  ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/libmp3lame/libmp3lame.a
-)
-endif ()
 
-add_executable ( converter ${converter_src} ) 
+target_link_libraries (
+  converter_lib
+  ${lame_lib}
+  ${CMAKE_THREAD_LIBS_INIT}
+) 
 
 target_link_libraries ( 
   converter 
-  ${converter_src_lib}
-  ${lame_lib}
-  ${CMAKE_THREAD_LIBS_INIT}
+  converter_lib
  )

@@ -12,8 +12,19 @@ project ( CONVERTER )
 
 add_subdirectory ( src )
 
-if ( UNIX )
-add_subdirectory ( test )
-endif ()
+configure_file(${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/Makefile.unix
+    		   ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/Makefile COPYONLY)
 
-#add_test (NAME ut COMMAND run_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
+add_custom_target(
+  build_lame ALL
+  #COMMAND ${CMAKE_MAKE_PROGRAM} -f Makefile.unix
+  COMMAND ${CMAKE_MAKE_PROGRAM}
+  WORKING_DIRECTORY ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/
+  COMMENT "Build LAME"
+)
+
+if ( UNIX )
+add_subdirectory ( ${CONVERTER_SOURCE_DIR}/libs/googletest/googletest/ )
+add_subdirectory ( test )
+add_test (NAME ut COMMAND run_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
+endif ()

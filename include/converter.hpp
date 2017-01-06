@@ -8,6 +8,10 @@
 #include <dirent.h>
 #include <pthread.h>
 
+#ifdef __linux__
+  #include <gtest/gtest_prod.h>
+#endif
+
 extern "C"
 {
   #include "wav.h"
@@ -40,6 +44,13 @@ private:
   cConverter(void);
   cConverter(const cConverter &arg_copy);
   cConverter& operator=(const cConverter &arg_copy);
+
+#ifdef __linux__
+  FRIEND_TEST( ReadFilesTestCase, NumFiles );
+  FRIEND_TEST( ReadFilesTestCase, InvalidDir );
+  FRIEND_TEST( ConvertTestCase, SingleThread );
+  FRIEND_TEST( ConvertTestCase, MultiThread );
+#endif
 
 public:
   static void convertFilesFromDir( const std::string arg_dir );

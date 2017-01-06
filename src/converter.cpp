@@ -26,7 +26,6 @@ uint16_t cConverter::threadsCounter = 0U;
 
 void cConverter::convertFilesFromDir( const std::string arg_dir )
 {
-  dir = arg_dir;
   const std::vector<sWavFile> loc_files = readFiles( arg_dir );
 
 #ifdef _WIN32
@@ -69,8 +68,6 @@ void cConverter::convertFilesFromDir( const std::string arg_dir )
   {
     pthread_join( loc_threads[ loc_idx_file ], NULL );
   }
-
-  pthread_exit( NULL );
 }
 
 std::vector<sWavFile> cConverter::readFiles( const std::string arg_dir )
@@ -81,6 +78,7 @@ std::vector<sWavFile> cConverter::readFiles( const std::string arg_dir )
 
   if ( loc_pDir != NULL)
   {
+    dir = arg_dir;
     struct dirent * loc_pEnt = readdir ( loc_pDir );
 
     while ( loc_pEnt != NULL )
@@ -163,8 +161,18 @@ void cConverter::convertFile( const sWavFile &arg_file )
          */
         const int loc_numSamples = loc_bytesRead / (2 * sizeof(short int));
         const int loc_bytesEnc = lame_encode_buffer_interleaved( loc_lame, loc_pcmBuffer, loc_numSamples, loc_mp3Buffer, MP3_SIZE );
-        loc_output.write( reinterpret_cast<char *>( loc_mp3Buffer ), loc_bytesEnc );
-        loc_wavSizeLeft -= static_cast<uint32_t>( loc_input.gcount() );
+
+        if ( loc_bytesEnc >= 0 )
+        {
+          loc_output.write( reinterpret_cast<char *>( loc_mp3Buffer ), loc_bytesEnc );
+          loc_wavSizeLeft -= static_cast<uint32_t>( loc_input.gcount() );
+        }
+        else
+        {
+          pthread_mutex_lock( &mutexCout );
+          std::cout << "             Failed converting - LAME error: " << arg_file.name << std::endl;
+          pthread_mutex_unlock( &mutexCout );
+        }
       }
       else
       {
@@ -187,7 +195,7 @@ void cConverter::convertFile( const sWavFile &arg_file )
   else
   {
     pthread_mutex_lock( &mutexCout );
-    std::cout << "             Failed converting: " << arg_file.name << std::endl;
+    std::cout << "             Failed converting - bad paths: " << arg_file.name << std::endl;
     pthread_mutex_unlock( &mutexCout );
   }
 }
