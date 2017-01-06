@@ -17,7 +17,6 @@ configure_file(${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/Makefile.unix
 
 add_custom_target(
   build_lame ALL
-  #COMMAND ${CMAKE_MAKE_PROGRAM} -f Makefile.unix
   COMMAND ${CMAKE_MAKE_PROGRAM}
   WORKING_DIRECTORY ${CONVERTER_SOURCE_DIR}/libs/lame-3.99.5/
   COMMENT "Build LAME"

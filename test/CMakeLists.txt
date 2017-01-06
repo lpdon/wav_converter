@@ -5,12 +5,6 @@ include_directories (
   ${CONVERTER_SOURCE_DIR}/libs/googletest/googletest/include 
 )
 
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.dbc
-#    		   ${CMAKE_CURRENT_BINARY_DIR}/test.dbc COPYONLY)
-    		   
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test.dbc
-#    		   ${CMAKE_CURRENT_BINARY_DIR}/../test.dbc COPYONLY)
-
 set (CMAKE_BUILD_TYPE Debug)
 add_definitions( -Wall )
 
