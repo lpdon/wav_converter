@@ -172,6 +172,7 @@ void cConverter::convertFile( const sWavFile &arg_file )
           pthread_mutex_lock( &mutexCout );
           std::cout << "             Failed converting - LAME error: " << arg_file.name << std::endl;
           pthread_mutex_unlock( &mutexCout );
+          return;
         }
       }
       else
