@@ -5,6 +5,8 @@ include_directories (
   ${CONVERTER_SOURCE_DIR}/libs/googletest/googletest/include 
 )
 
+file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 set (CMAKE_BUILD_TYPE Debug)
 add_definitions( -Wall )
 
